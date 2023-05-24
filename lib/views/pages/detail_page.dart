@@ -183,6 +183,12 @@ class _DetailPageState extends State<DetailPage> {
             ),
           ),
           Positioned(
+              bottom: 0,
+              child: Container(
+                height: size.height,
+                decoration: const BoxDecoration(color: Colors.white),
+              )),
+          Positioned(
             top: defaultpd * 8,
             right: defaultpd * 6,
             child: Image.network(

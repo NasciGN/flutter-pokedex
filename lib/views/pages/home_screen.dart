@@ -72,8 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-//,
-
 class PokemonCard extends StatelessWidget {
   const PokemonCard({
     super.key,
