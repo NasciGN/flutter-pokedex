@@ -12,16 +12,15 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  final List<Widget> _widgetOptions = const [
-    Text('About'),
-    Text('Stats'),
-    Text('Evolution'),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-
+    int selectedIndex = 1;
+    List<Widget> Cards = const [
+      EvolutionCard(),
+      EvolutionCard(),
+      EvolutionCard(),
+    ];
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 209, 98, 90),
       appBar: AppBar(
@@ -60,29 +59,16 @@ class _DetailPageState extends State<DetailPage> {
                           topRight: Radius.circular(45))),
                   child: Column(
                     children: [
-                      const PokemonMenu(),
+                      PokemonMenu(
+                        selectedIndex: selectedIndex,
+                      ),
                       SizedBox(
                         height: size.height * 0.03,
                       ),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.all(defaultpd),
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisSpacing: 20,
-                          mainAxisSpacing: 40,
-                          crossAxisCount: 2,
-                        ),
-                        itemCount: 1, // Defina o número total de itens
-                        itemBuilder: (BuildContext context, int index) {
-                          return const SizedBox(
-                            height: double.infinity,
-                            child: EvolutionCard(),
-                          );
-                        },
+                      IndexedStack(
+                        index: selectedIndex,
+                        children: [PokemonInfo(), EvolutionPage(Cards: Cards)],
                       ),
-                      EvolutionCard()
                     ],
                   ),
                 ),
@@ -99,6 +85,36 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class EvolutionPage extends StatelessWidget {
+  const EvolutionPage({
+    super.key,
+    required this.Cards,
+  });
+
+  final List<Widget> Cards;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      padding: const EdgeInsets.all(defaultpd),
+      physics: const NeverScrollableScrollPhysics(),
+
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisSpacing: 20,
+          mainAxisSpacing: 20,
+          crossAxisCount: 2,
+          childAspectRatio: 0.75),
+      itemCount: Cards.length, // Defina o número total de itens
+      itemBuilder: (BuildContext context, int index) {
+        return SizedBox(
+          child: Cards[index],
+        );
+      },
     );
   }
 }

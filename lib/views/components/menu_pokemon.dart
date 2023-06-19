@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 
 class PokemonMenu extends StatefulWidget {
-  const PokemonMenu({super.key});
-
+  const PokemonMenu({super.key, required this.selectedIndex});
+  final int selectedIndex;
   @override
   State<PokemonMenu> createState() => _PokemonMenuState();
 }
 
 class _PokemonMenuState extends State<PokemonMenu> {
-  int _selectedIndex = 1;
+  int selectedIndex = 0;
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index; // Atualiza a opção selecionada
+      selectedIndex = index; // Atualiza a opção selecionada
     });
   }
 
@@ -34,7 +32,7 @@ class _PokemonMenuState extends State<PokemonMenu> {
             decoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(
-              color: _selectedIndex == 0
+              color: selectedIndex == 0
                   ? const Color.fromARGB(255, 209, 98, 90)
                   : const Color.fromARGB(0, 131, 131, 131),
               width: 3,
@@ -43,7 +41,7 @@ class _PokemonMenuState extends State<PokemonMenu> {
               child: Text(
                 'About',
                 style: TextStyle(
-                  color: _selectedIndex == 0 ? Colors.black : Colors.grey,
+                  color: selectedIndex == 0 ? Colors.black : Colors.grey,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -60,7 +58,7 @@ class _PokemonMenuState extends State<PokemonMenu> {
             decoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(
-              color: _selectedIndex == 1
+              color: selectedIndex == 1
                   ? const Color.fromARGB(255, 209, 98, 90)
                   : const Color.fromARGB(0, 131, 131, 131),
               width: 3,
@@ -69,7 +67,7 @@ class _PokemonMenuState extends State<PokemonMenu> {
               child: Text(
                 'Stats',
                 style: TextStyle(
-                  color: _selectedIndex == 1 ? Colors.black : Colors.grey,
+                  color: selectedIndex == 1 ? Colors.black : Colors.grey,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -86,7 +84,7 @@ class _PokemonMenuState extends State<PokemonMenu> {
             decoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(
-              color: _selectedIndex == 2
+              color: selectedIndex == 2
                   ? const Color.fromARGB(255, 209, 98, 90)
                   : const Color.fromARGB(0, 131, 131, 131),
               width: 3,
@@ -95,7 +93,7 @@ class _PokemonMenuState extends State<PokemonMenu> {
               child: Text(
                 'Evolution',
                 style: TextStyle(
-                  color: _selectedIndex == 2 ? Colors.black : Colors.grey,
+                  color: selectedIndex == 2 ? Colors.black : Colors.grey,
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -22,10 +22,19 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 margin: const EdgeInsets.only(
                     top: defaultpd * 2, bottom: defaultpd * 2),
-                child: const Text(
-                  'Pokédex',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: titleFontSize),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Pokédex',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: titleFontSize),
+                    ),
+                    GestureDetector(
+                      onTap: () {},
+                      child: const Icon(Icons.person),
+                    )
+                  ],
                 ),
               ),
               const Text(
@@ -115,8 +124,8 @@ class PokemonCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             fontSize: 20),
                       ),
-                      Row(
-                        children: const [
+                      const Row(
+                        children: [
                           PokemonType(type: 'Grass'),
                           PokemonType(type: 'Poison')
                         ],
