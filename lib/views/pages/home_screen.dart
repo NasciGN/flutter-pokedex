@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pokedex/views/components/constants.dart';
+
+import '../../models/pokemon.dart';
+import '../../modelsviews/pokeapi.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,6 +13,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _pokemon = TextEditingController();
+  Pokemon? thisPokemon;
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,10 +53,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: defaultpd * 3,
               ),
               TextField(
+                controller: _pokemon,
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: Color.fromARGB(221, 88, 88, 88),
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      fecthPokemon(_pokemon.text);
+                    },
+                    child: const Icon(
+                      Icons.search,
+                      color: Color.fromARGB(221, 88, 88, 88),
+                    ),
                   ),
                   hintText: 'What Pokémon are you looking for?',
                   filled: true,
@@ -61,17 +74,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   contentPadding: const EdgeInsets.symmetric(
                       vertical: defaultpd * 2, horizontal: defaultpd * 2),
                 ),
+                onSubmitted: (String value) async {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  thisPokemon = await fecthPokemon(_pokemon.text);
+                  setState(() {
+                    isLoading = false;
+                  });
+                },
               ),
               const SizedBox(
                 height: defaultpd * 5,
               ),
-              const PokemonCard(indexPokemon: '#0001', name: 'Bulbassaur'),
+              isLoading
+                  ? Text('Nothing to see here')
+                  : PokemonCard(
+                      pokemon: thisPokemon,
+                    ),
               const SizedBox(
                 height: defaultpd * 2,
-              ),
-              const PokemonCard(indexPokemon: '#0001', name: 'Bulbassaur'),
-              const SizedBox(
-                height: defaultpd,
               ),
             ],
           ),
@@ -84,12 +106,10 @@ class _HomeScreenState extends State<HomeScreen> {
 class PokemonCard extends StatelessWidget {
   const PokemonCard({
     super.key,
-    required this.indexPokemon,
-    required this.name,
+    required this.pokemon,
   });
 
-  final String indexPokemon;
-  final String name;
+  final Pokemon? pokemon;
 
   @override
   Widget build(BuildContext context) {
@@ -112,22 +132,21 @@ class PokemonCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        indexPokemon,
+                        ("# ${pokemon?.id}"),
                         style: const TextStyle(
                             color: Color.fromARGB(255, 78, 47, 47),
                             fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        name,
+                        pokemon!.name,
                         style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 20),
                       ),
-                      const Row(
+                      Row(
                         children: [
-                          PokemonType(type: 'Grass'),
-                          PokemonType(type: 'Poison')
+                          PokemonType(type: pokemon?.types[0]),
                         ],
                       ),
                     ],

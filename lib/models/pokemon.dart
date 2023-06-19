@@ -17,18 +17,19 @@
 // location
 
 class Pokemon {
-  String id;
+  int id;
   bool isDefault;
   String name;
   String sprite;
-  String hp;
-  String defense;
-  String specialAttack;
-  String specialDefense;
-  String speed;
-  List<String> types;
-  double weight;
-  double height;
+  int hp;
+  int attack;
+  int defense;
+  int specialAttack;
+  int specialDefense;
+  int speed;
+  List<dynamic> types;
+  int weight;
+  int height;
 
   Pokemon({
     required this.id,
@@ -36,6 +37,7 @@ class Pokemon {
     required this.name,
     required this.sprite,
     required this.hp,
+    required this.attack,
     required this.defense,
     required this.specialAttack,
     required this.specialDefense,
