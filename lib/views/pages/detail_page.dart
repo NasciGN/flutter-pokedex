@@ -304,31 +304,45 @@ class AboutPage extends StatelessWidget {
           ]),
         ),
         const SizedBox(
-          height: 150,
+          height: 50,
         ),
-        GestureDetector(
-          onTap: () {
-            fetchLocation();
-          },
-          child: Container(
-            width: 200,
-            height: 60,
-            decoration: BoxDecoration(
-                color: Color(int.parse(pokemon!.color)),
-                borderRadius: BorderRadius.circular(20)),
-            child: const Center(
-              child: Text(
-                'Location',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    letterSpacing: 2),
-              ),
-            ),
-          ),
-        )
+        LocationButton(pokemon: pokemon),
       ],
+    );
+  }
+}
+
+class LocationButton extends StatelessWidget {
+  const LocationButton({
+    super.key,
+    required this.pokemon,
+  });
+
+  final Pokemon? pokemon;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        fetchLocation();
+      },
+      child: Container(
+        width: 200,
+        height: 60,
+        decoration: BoxDecoration(
+            color: Color(int.parse(pokemon!.color)),
+            borderRadius: BorderRadius.circular(20)),
+        child: const Center(
+          child: Text(
+            'Location',
+            style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                letterSpacing: 3),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -466,30 +480,10 @@ class PokemonStats extends StatelessWidget {
           max: 255 + 190 + 230 + 195 + 230 + 180,
           color: actualPoke!.color,
         ),
-        Center(
-          child: GestureDetector(
-            onTap: () {
-              fetchLocation();
-            },
-            child: Container(
-              width: 200,
-              height: 60,
-              decoration: BoxDecoration(
-                  color: Color(int.parse(actualPoke!.color)),
-                  borderRadius: BorderRadius.circular(20)),
-              child: const Center(
-                child: Text(
-                  'Location',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      letterSpacing: 2),
-                ),
-              ),
-            ),
-          ),
-        )
+        const SizedBox(
+          height: 50,
+        ),
+        Center(child: LocationButton(pokemon: actualPoke)),
       ],
     );
   }
