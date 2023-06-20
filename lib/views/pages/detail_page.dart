@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:pokedex/modelsviews/locapi.dart';
 import 'package:pokedex/views/components/constants.dart';
 
 import '../../models/pokemon.dart';
@@ -306,7 +307,9 @@ class AboutPage extends StatelessWidget {
           height: 150,
         ),
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            fetchLocation();
+          },
           child: Container(
             width: 200,
             height: 60,
@@ -463,6 +466,30 @@ class PokemonStats extends StatelessWidget {
           max: 255 + 190 + 230 + 195 + 230 + 180,
           color: actualPoke!.color,
         ),
+        Center(
+          child: GestureDetector(
+            onTap: () {
+              fetchLocation();
+            },
+            child: Container(
+              width: 200,
+              height: 60,
+              decoration: BoxDecoration(
+                  color: Color(int.parse(actualPoke!.color)),
+                  borderRadius: BorderRadius.circular(20)),
+              child: const Center(
+                child: Text(
+                  'Location',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      letterSpacing: 2),
+                ),
+              ),
+            ),
+          ),
+        )
       ],
     );
   }
