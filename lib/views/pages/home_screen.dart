@@ -113,7 +113,18 @@ class _HomeScreenState extends State<HomeScreen> {
               height: defaultpd * 5,
             ),
             searchPokemons.isEmpty
-                ? const Text('Nothing')
+                ? Padding(
+                    padding: const EdgeInsets.only(top: defaultpd),
+                    child: Center(
+                      child: searchPokemons.isNotEmpty &&
+                              searchPokemons[0]!.id != 0
+                          ? const CircularProgressIndicator()
+                          : const Text(
+                              'Nenhum Pokémon encontrado',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                    ),
+                  )
                 : Expanded(
                     child: ListView.builder(
                     physics: const BouncingScrollPhysics(),

@@ -22,7 +22,23 @@ Future<Pokemon?> fecthPokemon(String pokemon) async {
 
   if (response.statusCode == 200) {
     searchPokemon = jsonPokeDecode(jsonDecode(response.body));
-  } else {}
+  } else {
+    return Pokemon(
+        id: 0,
+        isDefault: false,
+        name: '',
+        sprite: '',
+        hp: 0,
+        attack: 0,
+        defense: 0,
+        specialAttack: 0,
+        specialDefense: 0,
+        speed: 0,
+        types: [],
+        weight: 0,
+        height: 0,
+        color: '');
+  }
 
   return searchPokemon;
 }
