@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:pokedex/views/pages/user_profile.dart';
 import '../../models/pokemon.dart';
 import '../../modelsviews/pokeapi.dart';
+import 'login_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -62,10 +63,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const UserPage()));
+                      if (userOn()) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const UserPage()));
+                      } else {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()));
+                      }
                     },
                     child: const Icon(Icons.person),
                   )
@@ -83,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
             TextField(
               controller: _pokemon,
               decoration: InputDecoration(
-                suffixIcon: GestureDetector(
+                prefixIcon: GestureDetector(
                   onTap: () async {
                     setState(() {
                       isLoading = true;
@@ -136,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             const SizedBox(
-              height: defaultpd * 5,
+              height: defaultpd,
             ),
             if (searchPokemons.isEmpty && isLoading)
               const Center(

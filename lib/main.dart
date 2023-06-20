@@ -5,10 +5,11 @@ import 'package:get/get.dart';
 import 'modelsviews/firebase/firebase_options.dart';
 
 Future<void> main() async {
-  /* WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
+    name: 'pokedex-firebase',
     options: DefaultFirebaseOptions.currentPlatform,
-  ); */
+  );
   runApp(GetMaterialApp(
     initialRoute: '/home',
     getPages: [

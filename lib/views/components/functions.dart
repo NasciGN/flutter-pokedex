@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+
 String formatString(String name) {
   String cleanString = name.replaceAll(RegExp(r'[^a-zA-Z0-9]+'), ' ');
 
@@ -18,4 +20,9 @@ String formatNumber(String numberString) {
     numberString = '0$numberString';
   }
   return '#$numberString';
+}
+
+bool userOn() {
+  bool online = FirebaseAuth.instance.currentUser != null;
+  return online;
 }

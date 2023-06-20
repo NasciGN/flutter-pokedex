@@ -36,7 +36,7 @@ class _UserPageState extends State<UserPage> {
                 height: 40,
                 width: 120,
                 decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 185, 86, 79),
+                    color: const Color.fromARGB(255, 185, 86, 79),
                     borderRadius: BorderRadius.circular(20)),
                 child: const Center(
                   child: Text(

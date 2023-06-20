@@ -22,7 +22,7 @@ Future<List<Pokemon?>> fecthPokemon(String pokemon) async {
 
   if (response.statusCode == 200) {
     searchPokemon = jsonPokeDecode(jsonDecode(response.body));
-    print('POKEMON: $pokemon');
+
     tempList = [searchPokemon];
   } else {
     return tempList = [

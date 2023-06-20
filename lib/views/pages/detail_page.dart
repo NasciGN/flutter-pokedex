@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:pokedex/views/components/constants.dart';
 
 import '../../models/pokemon.dart';
@@ -16,6 +19,7 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   int selectedIndex = 0;
+  bool isFavorite = false;
   @override
   Widget build(BuildContext context) {
     void _onItemTapped(int index) {
@@ -43,10 +47,32 @@ class _DetailPageState extends State<DetailPage> {
       appBar: AppBar(
         backgroundColor: Color(int.parse(widget.actualPoke!.color)),
         elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+                vertical: defaultpd * 2, horizontal: defaultpd * 2),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  isFavorite = !isFavorite;
+                });
+              },
+              child: isFavorite
+                  ? const FaIcon(
+                      FontAwesomeIcons.heart,
+                      color: Colors.white,
+                    )
+                  : const FaIcon(
+                      FontAwesomeIcons.solidHeart,
+                      color: Colors.white,
+                    ),
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: SizedBox(
-          height: size.height,
+          height: size.height - 40,
           child: Stack(
             children: [
               Positioned(
@@ -178,8 +204,8 @@ class _DetailPageState extends State<DetailPage> {
                       IndexedStack(
                         index: selectedIndex,
                         children: [
-                          PokemonInfo(
-                            actualPoke: widget.actualPoke,
+                          AboutPage(
+                            pokemon: widget.actualPoke,
                           ),
                           PokemonStats(actualPoke: widget.actualPoke),
                           EvolutionPage(cards: cards)
@@ -201,6 +227,139 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class AboutPage extends StatelessWidget {
+  const AboutPage({super.key, required this.pokemon});
+
+  final Pokemon? pokemon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text(
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a consequat mi, in vestibulum velit. Nam vel lorem nec orci sagittis dictum et sed lorem. Nullam ac elit ultrices, tempus mi ac, posuere odio.',
+            style: TextStyle(
+              fontSize: titleFontSize * 0.5,
+            ),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(
+              horizontal: defaultpd * 6, vertical: defaultpd * 3),
+          padding: const EdgeInsets.symmetric(vertical: defaultpd * 2),
+          width: double.infinity,
+          height: 80,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2), // Cor da sombra
+                offset: const Offset(0, 3), // Deslocamento da sombra (x, y)
+                blurRadius: 4, // Raio de desfoque da sombra
+                spreadRadius: 2, // Propagação da sombra
+              ),
+            ],
+          ),
+          child:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Height',
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 117, 115, 115),
+                      fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                Text(
+                  '${pokemon!.height / 10} m | ${pokemon!.height * 10} cm',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Column(
+              children: [
+                const Text(
+                  'Weight',
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 117, 115, 115),
+                      fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                Text(
+                  '${pokemon!.weight / 10} Kg ',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ]),
+        ),
+        const SizedBox(
+          height: 150,
+        ),
+        GestureDetector(
+          onTap: () {},
+          child: Container(
+            width: 200,
+            height: 60,
+            decoration: BoxDecoration(
+                color: Color(int.parse(pokemon!.color)),
+                borderRadius: BorderRadius.circular(20)),
+            child: const Center(
+              child: Text(
+                'Location',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    letterSpacing: 2),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class InfoRow extends StatelessWidget {
+  const InfoRow({
+    super.key,
+    required this.pokemon,
+    required this.info,
+  });
+
+  final String pokemon;
+  final String info;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        SizedBox(
+            width: 100,
+            child: Text(
+              '$info:',
+              style: const TextStyle(
+                  fontSize: 18, color: Color.fromARGB(255, 133, 133, 133)),
+            )),
+        Text(
+          formatString(pokemon),
+          style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(255, 51, 49, 49)),
+        )
+      ],
     );
   }
 }
@@ -240,7 +399,113 @@ class PokemonStats extends StatelessWidget {
   final Pokemon? actualPoke;
   @override
   Widget build(BuildContext context) {
-    return Text("${actualPoke!.name}");
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: defaultpd * 2),
+          child: Text(
+            'Base Stats',
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: titleFontSize * 0.9,
+                color: Color(int.parse(actualPoke!.color))),
+          ),
+        ),
+        StatsBar(
+          attribute: actualPoke!.hp,
+          stat: 'HP',
+          max: 255,
+          color: actualPoke!.color,
+        ),
+        StatsBar(
+          attribute: actualPoke!.attack,
+          stat: 'Attack',
+          max: 190,
+          color: actualPoke!.color,
+        ),
+        StatsBar(
+          attribute: actualPoke!.defense,
+          stat: 'Defense',
+          max: 230,
+          color: actualPoke!.color,
+        ),
+        StatsBar(
+          attribute: actualPoke!.specialAttack,
+          stat: 'Sp. Attack',
+          max: 195,
+          color: actualPoke!.color,
+        ),
+        StatsBar(
+          attribute: actualPoke!.specialDefense,
+          stat: 'Sp. Defense',
+          max: 230,
+          color: actualPoke!.color,
+        ),
+        StatsBar(
+          attribute: actualPoke!.speed,
+          stat: 'Speed',
+          max: 180,
+          color: actualPoke!.color,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        StatsBar(
+          attribute: actualPoke!.hp +
+              actualPoke!.attack +
+              actualPoke!.defense +
+              actualPoke!.specialAttack +
+              actualPoke!.specialDefense +
+              actualPoke!.speed,
+          stat: 'Total',
+          max: 255 + 190 + 230 + 195 + 230 + 180,
+          color: actualPoke!.color,
+        ),
+      ],
+    );
+  }
+}
+
+//
+class StatsBar extends StatelessWidget {
+  const StatsBar(
+      {super.key,
+      required this.attribute,
+      required this.stat,
+      required this.max,
+      required this.color});
+
+  final int attribute;
+  final int max;
+  final String stat;
+  final String color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: defaultpd / 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+              width: 80,
+              child: Text(
+                stat,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              )),
+          LinearPercentIndicator(
+            width: 240.0,
+            lineHeight: 8.0,
+            percent: attribute / max,
+            progressColor: Color(int.parse(color)),
+            barRadius: const Radius.circular(20),
+          ),
+          Text('$max')
+        ],
+      ),
+    );
   }
 }
 
