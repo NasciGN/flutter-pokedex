@@ -3,7 +3,7 @@ import 'package:pokedex/views/components/constants.dart';
 
 import '../../models/pokemon.dart';
 import '../components/functions.dart';
-import '../components/menu_pokemon.dart';
+
 import 'home_screen.dart';
 
 class DetailPage extends StatefulWidget {
@@ -15,11 +15,18 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
+    void _onItemTapped(int index) {
+      setState(() {
+        selectedIndex = index;
+      });
+    }
+
     final Size size = MediaQuery.of(context).size;
-    int selectedIndex = 1;
-    List<Widget> Cards = [
+
+    List<Widget> cards = [
       EvolutionCard(
         poke: widget.actualPoke,
       ),
@@ -69,8 +76,101 @@ class _DetailPageState extends State<DetailPage> {
                           topRight: Radius.circular(45))),
                   child: Column(
                     children: [
-                      PokemonMenu(
-                        selectedIndex: selectedIndex,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _onItemTapped(0);
+                              });
+                            },
+                            child: Container(
+                              height: 40,
+                              width: size.height * 0.12,
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                color: selectedIndex == 0
+                                    ? const Color.fromARGB(255, 209, 98, 90)
+                                    : const Color.fromARGB(0, 131, 131, 131),
+                                width: 3,
+                              ))),
+                              child: Center(
+                                child: Text(
+                                  'About',
+                                  style: TextStyle(
+                                    color: selectedIndex == 0
+                                        ? Colors.black
+                                        : Colors.grey,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _onItemTapped(1);
+                              });
+                            },
+                            child: Container(
+                              height: 40,
+                              width: size.height * 0.12,
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                color: selectedIndex == 1
+                                    ? const Color.fromARGB(255, 209, 98, 90)
+                                    : const Color.fromARGB(0, 131, 131, 131),
+                                width: 3,
+                              ))),
+                              child: Center(
+                                child: Text(
+                                  'Stats',
+                                  style: TextStyle(
+                                    color: selectedIndex == 1
+                                        ? Colors.black
+                                        : Colors.grey,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _onItemTapped(2);
+                              });
+                            },
+                            child: Container(
+                              height: 40,
+                              width: size.height * 0.12,
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                color: selectedIndex == 2
+                                    ? const Color.fromARGB(255, 209, 98, 90)
+                                    : const Color.fromARGB(0, 131, 131, 131),
+                                width: 3,
+                              ))),
+                              child: Center(
+                                child: Text(
+                                  'Evolution',
+                                  style: TextStyle(
+                                    color: selectedIndex == 2
+                                        ? Colors.black
+                                        : Colors.grey,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(
                         height: size.height * 0.03,
@@ -81,7 +181,8 @@ class _DetailPageState extends State<DetailPage> {
                           PokemonInfo(
                             actualPoke: widget.actualPoke,
                           ),
-                          EvolutionPage(Cards: Cards)
+                          PokemonStats(actualPoke: widget.actualPoke),
+                          EvolutionPage(cards: cards)
                         ],
                       ),
                     ],
@@ -107,10 +208,10 @@ class _DetailPageState extends State<DetailPage> {
 class EvolutionPage extends StatelessWidget {
   const EvolutionPage({
     super.key,
-    required this.Cards,
+    required this.cards,
   });
 
-  final List<Widget> Cards;
+  final List<Widget> cards;
 
   @override
   Widget build(BuildContext context) {
@@ -124,20 +225,29 @@ class EvolutionPage extends StatelessWidget {
           mainAxisSpacing: 20,
           crossAxisCount: 2,
           childAspectRatio: 0.75),
-      itemCount: Cards.length, // Defina o número total de itens
+      itemCount: cards.length, // Defina o número total de itens
       itemBuilder: (BuildContext context, int index) {
         return SizedBox(
-          child: Cards[index],
+          child: cards[index],
         );
       },
     );
   }
 }
 
-class PokemonInfo extends StatelessWidget {
-  PokemonInfo({super.key, required this.actualPoke});
+class PokemonStats extends StatelessWidget {
+  const PokemonStats({super.key, required this.actualPoke});
+  final Pokemon? actualPoke;
+  @override
+  Widget build(BuildContext context) {
+    return Text("${actualPoke!.name}");
+  }
+}
 
-  Pokemon? actualPoke;
+class PokemonInfo extends StatelessWidget {
+  const PokemonInfo({super.key, required this.actualPoke});
+
+  final Pokemon? actualPoke;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -160,8 +270,10 @@ class PokemonInfo extends StatelessWidget {
         const SizedBox(
           height: defaultpd * 2,
         ),
-        const Row(
-          children: [PokemonType(type: 'Grass'), PokemonType(type: 'Poison')],
+        Row(
+          children: actualPoke!.types.map((type) {
+            return PokemonType(type: type);
+          }).toList(),
         ),
       ],
     );
@@ -169,9 +281,9 @@ class PokemonInfo extends StatelessWidget {
 }
 
 class EvolutionCard extends StatelessWidget {
-  EvolutionCard({super.key, required this.poke});
+  const EvolutionCard({super.key, required this.poke});
 
-  Pokemon? poke;
+  final Pokemon? poke;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;

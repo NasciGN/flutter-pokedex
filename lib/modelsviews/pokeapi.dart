@@ -10,9 +10,9 @@ bool isPokemonCode(String text) {
   return regex.hasMatch(text);
 }
 
-Future<Pokemon?> fecthPokemon(String pokemon) async {
+Future<List<Pokemon?>> fecthPokemon(String pokemon) async {
   Pokemon? searchPokemon;
-
+  List<Pokemon> tempList = [];
   if (!isPokemonCode(pokemon)) {
     pokemon = pokemon.toLowerCase();
   }
@@ -22,32 +22,36 @@ Future<Pokemon?> fecthPokemon(String pokemon) async {
 
   if (response.statusCode == 200) {
     searchPokemon = jsonPokeDecode(jsonDecode(response.body));
+    print('POKEMON: $pokemon');
+    tempList = [searchPokemon];
   } else {
-    return Pokemon(
-        id: 0,
-        isDefault: false,
-        name: '',
-        sprite: '',
-        hp: 0,
-        attack: 0,
-        defense: 0,
-        specialAttack: 0,
-        specialDefense: 0,
-        speed: 0,
-        types: [],
-        weight: 0,
-        height: 0,
-        color: '');
+    return tempList = [
+      Pokemon(
+          id: 0,
+          isDefault: false,
+          name: '',
+          sprite: 'assets/images/error-search.png',
+          hp: 0,
+          attack: 0,
+          defense: 0,
+          specialAttack: 0,
+          specialDefense: 0,
+          speed: 0,
+          types: [],
+          weight: 0,
+          height: 0,
+          color: '')
+    ];
   }
 
-  return searchPokemon;
+  return tempList;
 }
 
 Future<List<Pokemon>> fetchPokemons() async {
   List<Pokemon> pokemons = [];
 
   final http.Response response =
-      await http.get(Uri.parse('$baseURL/pokemon?limit=50'));
+      await http.get(Uri.parse('$baseURL/pokemon?limit=10'));
 
   if (response.statusCode == 200) {
     var pokemon = jsonDecode(response.body)["results"];
@@ -63,7 +67,7 @@ Future<List<Pokemon>> fetchPokemons() async {
 Pokemon jsonPokeDecode(final json) {
   return Pokemon(
     id: json["id"] ?? 0,
-    isDefault: json["is_default"] ?? "",
+    isDefault: json["is_default"] ?? false,
     name: json["name"] ?? "",
     sprite: json["sprites"]["other"]["official-artwork"]["front_default"] ?? "",
     hp: json["stats"][0]["base_stat"] ?? 0,

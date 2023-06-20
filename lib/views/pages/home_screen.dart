@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pokedex/views/components/constants.dart';
 import 'package:pokedex/views/components/functions.dart';
 import 'package:pokedex/views/pages/detail_page.dart';
-
+import 'package:get/get.dart';
+import 'package:pokedex/views/pages/user_profile.dart';
 import '../../models/pokemon.dart';
 import '../../modelsviews/pokeapi.dart';
 
@@ -17,10 +18,15 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _pokemon = TextEditingController();
   Pokemon? thisPokemon;
 
-  Future<List<Pokemon?>> allPokes() async {
-    searchPokemons = await fetchPokemons();
-    isLoading = true;
-    return searchPokemons;
+  Future<void> allPokes() async {
+    setState(() {
+      isLoading = true;
+    });
+    cachedSearch.assignAll(await fetchPokemons());
+    searchPokemons.assignAll(cachedSearch);
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -29,7 +35,9 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
-  List<Pokemon?> searchPokemons = [];
+  final searchPokemons = <Pokemon>[].obs;
+  final cachedSearch = <Pokemon>[].obs;
+
   bool isLoading = false;
 
   @override
@@ -53,7 +61,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.bold, fontSize: titleFontSize),
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const UserPage()));
+                    },
                     child: const Icon(Icons.person),
                   )
                 ],
@@ -75,9 +88,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     setState(() {
                       isLoading = true;
                     });
-                    searchPokemons = [];
-                    searchPokemons.add(await fecthPokemon(_pokemon.text));
-
+                    if (_pokemon.text.isEmpty && searchPokemons.length == 1) {
+                      searchPokemons.assignAll(cachedSearch);
+                    } else if (_pokemon.text.isNotEmpty) {
+                      searchPokemons.assignAll([]);
+                      List<Pokemon?> tempList =
+                          await fecthPokemon(_pokemon.text);
+                      searchPokemons.assignAll(tempList.whereType<Pokemon>());
+                    } else {
+                      searchPokemons.assignAll(cachedSearch);
+                    }
                     setState(() {
                       isLoading = false;
                     });
@@ -101,9 +121,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   isLoading = true;
                 });
-                searchPokemons = [];
-                searchPokemons.add(await fecthPokemon(_pokemon.text));
-
+                if (_pokemon.text.isEmpty && searchPokemons.length == 1) {
+                  searchPokemons.assignAll(cachedSearch);
+                } else if (_pokemon.text.isNotEmpty) {
+                  searchPokemons.assignAll([]);
+                  List<Pokemon?> tempList = await fecthPokemon(_pokemon.text);
+                  searchPokemons.assignAll(tempList.whereType<Pokemon>());
+                } else {
+                  searchPokemons.assignAll(cachedSearch);
+                }
                 setState(() {
                   isLoading = false;
                 });
@@ -112,29 +138,53 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(
               height: defaultpd * 5,
             ),
-            searchPokemons.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.only(top: defaultpd),
-                    child: Center(
-                      child: searchPokemons.isNotEmpty &&
-                              searchPokemons[0]!.id != 0
-                          ? const CircularProgressIndicator()
-                          : const Text(
-                              'Nenhum Pokémon encontrado',
-                              style: TextStyle(fontSize: 16),
-                            ),
+            if (searchPokemons.isEmpty && isLoading)
+              const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.red,
+                ),
+              )
+            else
+              searchPokemons[0].id == 0
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: defaultpd),
+                      child: Center(
+                          child: Column(
+                        children: [
+                          Image(
+                            image: AssetImage(searchPokemons[0].sprite),
+                            height: 65,
+                          ),
+                          const SizedBox(
+                            height: defaultpd * 5,
+                          ),
+                          const Text(
+                            'Opss...',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: defaultpd * 3),
+                          ),
+                          const Text(
+                            'No pokemon found',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: defaultpd * 2.5),
+                          ),
+                        ],
+                      )),
+                    )
+                  : Expanded(
+                      child: Obx(() => ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: searchPokemons.length,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: defaultpd * 2),
+                            itemBuilder: (BuildContext context, int index) {
+                              return PokemonCard(
+                                  pokemon: searchPokemons[index]);
+                            },
+                          )),
                     ),
-                  )
-                : Expanded(
-                    child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: searchPokemons.length,
-                    padding:
-                        const EdgeInsets.symmetric(vertical: defaultpd * 2),
-                    itemBuilder: (BuildContext context, int index) {
-                      return PokemonCard(pokemon: searchPokemons[index]);
-                    },
-                  )),
           ],
         ),
       ),
@@ -190,19 +240,12 @@ class PokemonCard extends StatelessWidget {
                             fontSize: 20),
                       ),
                       Row(
-                        children: [
-                          PokemonType(type: pokemon?.types[0]),
-                        ],
+                        children: pokemon!.types.map((type) {
+                          return PokemonType(type: type);
+                        }).toList(),
                       ),
                     ],
                   ),
-                  Container(
-                    margin: const EdgeInsets.only(left: defaultpd * 12),
-                    child: Image.network(
-                      pokemon!.sprite,
-                      height: 100,
-                    ),
-                  )
                 ]),
               ),
               Positioned(
@@ -212,7 +255,18 @@ class PokemonCard extends StatelessWidget {
                   'assets/images/icons/pokeball.png',
                   color: Colors.white.withOpacity(0.2),
                 ),
-              )
+              ),
+              Positioned(
+                right: defaultpd * 5,
+                top: defaultpd * 2,
+                child: Container(
+                  margin: const EdgeInsets.only(left: defaultpd * 12),
+                  child: Image.network(
+                    pokemon!.sprite,
+                    height: 100,
+                  ),
+                ),
+              ),
             ],
           )),
     );
@@ -220,19 +274,27 @@ class PokemonCard extends StatelessWidget {
 }
 
 class PokemonType extends StatelessWidget {
-  const PokemonType({super.key, required this.type});
+  const PokemonType({
+    Key? key,
+    required this.type,
+  }) : super(key: key);
+
   final String type;
+
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(right: defaultpd),
       padding: const EdgeInsets.symmetric(
-          horizontal: defaultpd * 2, vertical: defaultpd / 2),
+        horizontal: defaultpd * 2,
+        vertical: defaultpd / 2,
+      ),
       decoration: const BoxDecoration(
-          color: Colors.white10,
-          borderRadius: BorderRadius.all(Radius.circular(15))),
+        color: Colors.white10,
+        borderRadius: BorderRadius.all(Radius.circular(15)),
+      ),
       child: Text(
-        type,
+        formatString(type),
         style: const TextStyle(color: Colors.white),
       ),
     );
