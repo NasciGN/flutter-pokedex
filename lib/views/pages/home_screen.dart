@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:pokedex/views/components/constants.dart';
+import 'package:pokedex/views/components/functions.dart';
+import 'package:pokedex/views/pages/detail_page.dart';
 
 import '../../models/pokemon.dart';
 import '../../modelsviews/pokeapi.dart';
@@ -15,88 +16,115 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _pokemon = TextEditingController();
   Pokemon? thisPokemon;
+
+  Future<List<Pokemon?>> allPokes() async {
+    searchPokemons = await fetchPokemons();
+    isLoading = true;
+    return searchPokemons;
+  }
+
+  @override
+  void initState() {
+    allPokes();
+    super.initState();
+  }
+
+  List<Pokemon?> searchPokemons = [];
   bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: defaultpd * 3, vertical: defaultpd * 5),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(
-                    top: defaultpd * 2, bottom: defaultpd * 2),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Pokédex',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: titleFontSize),
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: const Icon(Icons.person),
-                    )
-                  ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(
+            horizontal: defaultpd * 3, vertical: defaultpd * 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(
+                  top: defaultpd * 2, bottom: defaultpd * 2),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Pokédex',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: titleFontSize),
+                  ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: const Icon(Icons.person),
+                  )
+                ],
+              ),
+            ),
+            const Text(
+              'Search for Pokémon by name or using the National Pokédex number:',
+              style: TextStyle(
+                  fontSize: sectionFontSize, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(
+              height: defaultpd * 3,
+            ),
+            TextField(
+              controller: _pokemon,
+              decoration: InputDecoration(
+                suffixIcon: GestureDetector(
+                  onTap: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    searchPokemons = [];
+                    searchPokemons.add(await fecthPokemon(_pokemon.text));
+
+                    setState(() {
+                      isLoading = false;
+                    });
+                  },
+                  child: const Icon(
+                    Icons.search,
+                    color: Color.fromARGB(221, 88, 88, 88),
+                  ),
                 ),
+                hintText: 'What Pokémon are you looking for?',
+                filled: true,
+                fillColor: Colors.grey[200],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: defaultpd * 2, horizontal: defaultpd * 2),
               ),
-              const Text(
-                'Search for Pokémon by name or using the National Pokédex number:',
-                style: TextStyle(
-                    fontSize: sectionFontSize, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(
-                height: defaultpd * 3,
-              ),
-              TextField(
-                controller: _pokemon,
-                decoration: InputDecoration(
-                  suffixIcon: GestureDetector(
-                    onTap: () {
-                      fecthPokemon(_pokemon.text);
+              onSubmitted: (String value) async {
+                setState(() {
+                  isLoading = true;
+                });
+                searchPokemons = [];
+                searchPokemons.add(await fecthPokemon(_pokemon.text));
+
+                setState(() {
+                  isLoading = false;
+                });
+              },
+            ),
+            const SizedBox(
+              height: defaultpd * 5,
+            ),
+            searchPokemons.isEmpty
+                ? const Text('Nothing')
+                : Expanded(
+                    child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: searchPokemons.length,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: defaultpd * 2),
+                    itemBuilder: (BuildContext context, int index) {
+                      return PokemonCard(pokemon: searchPokemons[index]);
                     },
-                    child: const Icon(
-                      Icons.search,
-                      color: Color.fromARGB(221, 88, 88, 88),
-                    ),
-                  ),
-                  hintText: 'What Pokémon are you looking for?',
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: defaultpd * 2, horizontal: defaultpd * 2),
-                ),
-                onSubmitted: (String value) async {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  thisPokemon = await fecthPokemon(_pokemon.text);
-                  setState(() {
-                    isLoading = false;
-                  });
-                },
-              ),
-              const SizedBox(
-                height: defaultpd * 5,
-              ),
-              isLoading
-                  ? Text('Nothing to see here')
-                  : PokemonCard(
-                      pokemon: thisPokemon,
-                    ),
-              const SizedBox(
-                height: defaultpd * 2,
-              ),
-            ],
-          ),
+                  )),
+          ],
         ),
       ),
     );
@@ -115,12 +143,18 @@ class PokemonCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed('/detail');
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DetailPage(
+                      actualPoke: pokemon,
+                    )));
       },
       child: Container(
+          margin: const EdgeInsets.symmetric(vertical: defaultpd),
           height: 130,
-          decoration: const BoxDecoration(
-              color: Color.fromARGB(255, 209, 98, 90),
+          decoration: BoxDecoration(
+              color: Color(int.parse(pokemon!.color)),
               borderRadius: BorderRadius.all(Radius.circular(15))),
           child: Stack(
             children: [
@@ -132,13 +166,13 @@ class PokemonCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        ("# ${pokemon?.id}"),
+                        formatNumber("${pokemon?.id}"),
                         style: const TextStyle(
-                            color: Color.fromARGB(255, 78, 47, 47),
+                            color: Color.fromARGB(255, 255, 255, 255),
                             fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        pokemon!.name,
+                        formatString(pokemon!.name),
                         style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -152,9 +186,9 @@ class PokemonCard extends StatelessWidget {
                     ],
                   ),
                   Container(
-                    margin: const EdgeInsets.only(left: defaultpd * 6),
+                    margin: const EdgeInsets.only(left: defaultpd * 12),
                     child: Image.network(
-                      'https://nexus.traction.one/images/pokemon/pokemon/1.png',
+                      pokemon!.sprite,
                       height: 100,
                     ),
                   )

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:pokedex/views/components/constants.dart';
 
+import '../../models/pokemon.dart';
+import '../components/functions.dart';
 import '../components/menu_pokemon.dart';
 import 'home_screen.dart';
 
 class DetailPage extends StatefulWidget {
-  const DetailPage({super.key});
+  const DetailPage({super.key, required this.actualPoke});
+  final Pokemon? actualPoke;
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -16,15 +19,22 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     int selectedIndex = 1;
-    List<Widget> Cards = const [
-      EvolutionCard(),
-      EvolutionCard(),
-      EvolutionCard(),
+    List<Widget> Cards = [
+      EvolutionCard(
+        poke: widget.actualPoke,
+      ),
+      EvolutionCard(
+        poke: widget.actualPoke,
+      ),
+      EvolutionCard(
+        poke: widget.actualPoke,
+      ),
     ];
+
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 209, 98, 90),
+      backgroundColor: Color(int.parse(widget.actualPoke!.color)),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 209, 98, 90),
+        backgroundColor: Color(int.parse(widget.actualPoke!.color)),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -32,10 +42,10 @@ class _DetailPageState extends State<DetailPage> {
           height: size.height,
           child: Stack(
             children: [
-              const Positioned(
+              Positioned(
                 left: defaultpd * 2,
                 top: defaultpd * 2,
-                child: PokemonInfo(),
+                child: PokemonInfo(actualPoke: widget.actualPoke),
               ),
               Positioned(
                 top: defaultpd * 2,
@@ -67,7 +77,12 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                       IndexedStack(
                         index: selectedIndex,
-                        children: [PokemonInfo(), EvolutionPage(Cards: Cards)],
+                        children: [
+                          PokemonInfo(
+                            actualPoke: widget.actualPoke,
+                          ),
+                          EvolutionPage(Cards: Cards)
+                        ],
                       ),
                     ],
                   ),
@@ -77,7 +92,7 @@ class _DetailPageState extends State<DetailPage> {
                 top: defaultpd * 8,
                 right: defaultpd * 6,
                 child: Image.network(
-                  'https://nexus.traction.one/images/pokemon/pokemon/1.png',
+                  widget.actualPoke!.sprite,
                   height: defaultpd * 18,
                 ),
               ),
@@ -120,36 +135,33 @@ class EvolutionPage extends StatelessWidget {
 }
 
 class PokemonInfo extends StatelessWidget {
-  const PokemonInfo({
-    super.key,
-  });
+  PokemonInfo({super.key, required this.actualPoke});
 
+  Pokemon? actualPoke;
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '#001',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        Text(
+          formatNumber("${actualPoke?.id}"),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         const SizedBox(
           height: defaultpd,
         ),
-        const Text(
-          'Bubassaur',
-          style: TextStyle(
+        Text(
+          formatString(actualPoke!.name),
+          style: const TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30),
         ),
         const SizedBox(
           height: defaultpd * 2,
         ),
-        Row(
-          children: const [
-            PokemonType(type: 'Grass'),
-            PokemonType(type: 'Poison')
-          ],
+        const Row(
+          children: [PokemonType(type: 'Grass'), PokemonType(type: 'Poison')],
         ),
       ],
     );
@@ -157,10 +169,9 @@ class PokemonInfo extends StatelessWidget {
 }
 
 class EvolutionCard extends StatelessWidget {
-  const EvolutionCard({
-    super.key,
-  });
+  EvolutionCard({super.key, required this.poke});
 
+  Pokemon? poke;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -168,7 +179,7 @@ class EvolutionCard extends StatelessWidget {
       height: size.height * 0.25,
       width: size.height * 0.2,
       decoration: const BoxDecoration(
-          color: Colors.red,
+          color: Color.fromARGB(255, 250, 250, 250),
           borderRadius: BorderRadius.all(Radius.circular(15))),
       child: Column(
         children: [
@@ -183,22 +194,22 @@ class EvolutionCard extends StatelessWidget {
                 top: 40,
                 right: 25,
                 child: Image.network(
-                  'https://nexus.traction.one/images/pokemon/pokemon/1.png',
+                  poke!.sprite,
                   height: size.height * 0.14,
                 ),
               ),
             ],
           ),
-          const Text(
-            '#001',
-            style: TextStyle(
+          Text(
+            formatNumber("${poke?.id}"),
+            style: const TextStyle(
               color: Color.fromARGB(255, 0, 0, 0),
               fontWeight: FontWeight.bold,
             ),
           ),
-          const Text(
-            'Bulbasaur',
-            style: TextStyle(
+          Text(
+            formatString(poke!.name),
+            style: const TextStyle(
               color: Color.fromARGB(255, 0, 0, 0),
               fontWeight: FontWeight.bold,
               fontSize: 20,

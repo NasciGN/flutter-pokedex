@@ -25,6 +25,7 @@ class _PokemonMenuState extends State<PokemonMenu> {
         GestureDetector(
           onTap: () {
             _onItemTapped(0);
+            print('About');
           },
           child: Container(
             height: 40,
@@ -51,6 +52,7 @@ class _PokemonMenuState extends State<PokemonMenu> {
         GestureDetector(
           onTap: () {
             _onItemTapped(1);
+            print('Stats');
           },
           child: Container(
             height: 40,
@@ -77,6 +79,7 @@ class _PokemonMenuState extends State<PokemonMenu> {
         GestureDetector(
           onTap: () {
             _onItemTapped(2);
+            print('Evolution');
           },
           child: Container(
             height: 40,

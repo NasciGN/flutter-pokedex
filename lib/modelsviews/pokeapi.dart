@@ -22,11 +22,26 @@ Future<Pokemon?> fecthPokemon(String pokemon) async {
 
   if (response.statusCode == 200) {
     searchPokemon = jsonPokeDecode(jsonDecode(response.body));
-  } else {
-    print("Moio");
-  }
+  } else {}
 
   return searchPokemon;
+}
+
+Future<List<Pokemon>> fetchPokemons() async {
+  List<Pokemon> pokemons = [];
+
+  final http.Response response =
+      await http.get(Uri.parse('$baseURL/pokemon?limit=50'));
+
+  if (response.statusCode == 200) {
+    var pokemon = jsonDecode(response.body)["results"];
+    for (var poke in pokemon) {
+      final http.Response response = await http.get(Uri.parse(poke["url"]));
+      pokemons.add(jsonPokeDecode(jsonDecode(response.body)));
+      print("Pokemon ${poke["url"]} adicionado");
+    }
+  }
+  return pokemons;
 }
 
 Pokemon jsonPokeDecode(final json) {
@@ -46,5 +61,6 @@ Pokemon jsonPokeDecode(final json) {
         .toList(),
     weight: json["weight"] ?? 0,
     height: json["height"] ?? 0,
+    color: '',
   );
 }
